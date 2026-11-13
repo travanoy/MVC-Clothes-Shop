@@ -1,0 +1,48 @@
+@model List<CategoryListItem>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="page-header">
+    <h1>Categories</h1>
+    <p class="mb-0">Browse our collections</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <span class="empty-glyph">📂</span>
+        <h5>No categories yet</h5>
+        <p>Check back later for updates.</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var category in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="@category.ImageUrl"
+                         class="card-img-top"
+                         style="height: 200px; object-fit: cover;"
+                         onerror="this.onerror=null;this.src='/Placeholder.jpg'"
+                         alt="@category.Name" />
+
+                    <div class="card-body">
+                        <h5 class="card-title">@category.Name</h5>
+                        <span class="badge bg-secondary mb-2">@category.Field</span>
+                        <p class="card-text text-muted">@category.Description</p>
+                    </div>
+
+                    <div class="card-footer">
+                        <a asp-controller="Categories" asp-action="Details" asp-route-id="@category.Id"
+                           class="btn btn-primary w-100">
+                            View products
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

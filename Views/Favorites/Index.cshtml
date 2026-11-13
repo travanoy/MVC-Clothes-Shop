@@ -1,0 +1,63 @@
+@model List<FavoriteListItem>
+@{
+    ViewData["Title"] = "My Favorites";
+}
+
+<div class="page-header">
+    <h1>My Favorites</h1>
+    <p class="mb-0">@Model.Count saved product@(Model.Count != 1 ? "s" : "")</p>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <span class="empty-glyph">🤍</span>
+        <h5>You have no favorites yet</h5>
+        <p><a asp-controller="Home" asp-action="Index">Browse products</a> and save the ones you like!</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 position-relative">
+                    <form asp-controller="Favorites" asp-action="Toggle" asp-route-id="@item.ProductId" method="post"
+                          class="js-favorite-form position-absolute top-0 end-0 m-2" style="z-index: 5;">
+                        <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                        <button type="submit"
+                                class="btn btn-sm rounded-circle shadow-sm btn-heart btn-danger"
+                                title="Remove from favorites">
+                            ❤️
+                        </button>
+                    </form>
+                    <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId">
+                        <img src="@item.ImageUrl"
+                             class="card-img-top"
+                             style="height: 200px; object-fit: cover;"
+                             onerror="this.onerror=null;this.src='/Placeholder.jpg'"
+                             alt="@item.Name" />
+                    </a>
+                    <div class="card-body">
+                        <h5 class="card-title mb-1">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId"
+                               class="text-dark text-decoration-none">
+                                @item.Name
+                            </a>
+                        </h5>
+                        <span class="badge bg-secondary mb-2">@item.CategoryName</span>
+                        <p class="card-text text-muted text-truncate">@item.Description</p>
+                        <p class="price-tag fw-bold mb-0">@item.Price.ToString("C")</p>
+                    </div>
+                    <div class="card-footer d-flex gap-2">
+                        <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId"
+                           class="btn btn-primary flex-fill">
+                            View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

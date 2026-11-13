@@ -1,0 +1,69 @@
+﻿@using WorkerHub.ViewModels.Shared
+@model NavbarViewModel
+@{
+    var controller = ViewContext.RouteData.Values["Controller"]?.ToString() ?? string.Empty;
+    var initial = string.IsNullOrEmpty(Model.UserName) ? "?" : Model.UserName.Substring(0, 1).ToUpperInvariant();
+}
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark navbar-custom sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand brand-custom" asp-area="" asp-controller="Home" asp-action="Index">
+            <span class="brand-mark">S</span>Shumagh
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link nav-custom-link @(controller == "Home" ? "active" : "")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link nav-custom-link @(controller == "Categories" ? "active" : "")" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
+                </li>
+                @if (Model.IsSignedIn)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link nav-custom-link @(controller == "Favorites" ? "active" : "")" asp-area="" asp-controller="Favorites" asp-action="Index">Favorites</a>
+                    </li>
+                }
+            </ul>
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link nav-custom-link @(controller == "Cart" ? "active" : "")" asp-area="" asp-controller="Cart" asp-action="Index">
+                        Cart🛍️
+                        @if (Model.CartCount > 0)
+                        {
+                            <span class="badge badge-cart">@Model.CartCount</span>
+                        }
+                    </a>
+                </li>
+                @if (Model.IsSignedIn)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link px-2" asp-area="" asp-controller="Account" asp-action="Profile">
+                            <span class="user-chip">
+                                <span class="avatar">@initial</span>@Model.UserName
+                            </span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-light ms-2">Logout</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link nav-custom-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-custom-link" asp-controller="Account" asp-action="Register">Register</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>

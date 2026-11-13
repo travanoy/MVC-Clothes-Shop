@@ -1,0 +1,29 @@
+@model ProductListItem
+@{
+    ViewData["Title"] = "Delete Product - Admin";
+}
+
+<div class="page-head">
+    <h1>Delete product</h1>
+    <a asp-action="Index" class="btn btn-outline-secondary">Back to list</a>
+</div>
+
+<div class="alert alert-danger">Are you sure you want to delete this product? This cannot be undone.</div>
+
+<div class="card my-4" style="max-width: 480px;">
+    <img src="@Model.ImageUrl" class="card-img-top" style="height: 200px; object-fit: cover;"
+         onerror="this.onerror=null;this.src='/Placeholder.jpg'" alt="@Model.Name" />
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text mb-1">Sizes: <span class="fw-bold">@(Model.SizeNames.Any() ? string.Join(", ", Model.SizeNames) : "-")</span></p>
+        <p class="card-text mb-1">Colors: <span class="fw-bold">@(Model.ColorNames.Any() ? string.Join(", ", Model.ColorNames) : "-")</span></p>
+        <p class="card-text">@Model.Description</p>
+        <p class="price-tag fw-bold mb-0">@Model.Price.ToString("C")</p>
+    </div>
+</div>
+
+<form asp-action="Delete" method="post" class="d-flex gap-2">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger px-4">Delete</button>
+    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

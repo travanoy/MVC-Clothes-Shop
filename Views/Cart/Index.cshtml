@@ -1,0 +1,115 @@
+@using Microsoft.AspNetCore.Identity
+@model List<CartLine>
+@{
+    ViewData["Title"] = "Cart";
+    var signedIn = User.Identity?.IsAuthenticated == true;
+    decimal total = ViewBag.Total ?? 0m;
+}
+
+<div class="page-header">
+    <h1>Cart</h1>
+    @if (Model.Any())
+    {
+        <p class="mb-0">@Model.Sum(l => l.Quantity) item(s) in your cart</p>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty((string?)ViewBag.Notice))
+{
+    <div class="alert alert-warning">@ViewBag.Notice</div>
+}
+
+@if (!Model.Any())
+{
+    <div class="card empty-state">
+        <span class="empty-glyph">🛒</span>
+        <h5>Your cart is empty</h5>
+        <p><a asp-controller="Home" asp-action="Index">Browse products</a> and add some!</p>
+    </div>
+}
+else
+{
+    <div class="card mb-4">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 70px;"></th>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th class="text-end">Line total</th>
+                        <th style="width: 100px;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@item.ImageUrl" alt="@item.Name"
+                                     class="rounded-3"
+                                     style="width: 48px; height: 48px; object-fit: cover;"
+                                     onerror="this.onerror=null;this.src='/Placeholder.jpg'" />
+                            </td>
+                            <td>
+                                <a asp-controller="Products" asp-action="Details" asp-route-id="@item.ProductId" class="fw-semibold">@item.Name</a>
+                                @if (!string.IsNullOrEmpty(item.SizeName))
+                                {
+                                    <span class="text-muted small d-block">Size: @item.SizeName</span>
+                                }
+                                @if (!string.IsNullOrEmpty(item.ColorName))
+                                {
+                                    <span class="text-muted small d-block">Color: @item.ColorName</span>
+                                }
+                            </td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>
+                                <div class="d-inline-flex align-items-center">
+                                    <form asp-action="ChangeQuantity" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.ProductId" />
+                                        <input type="hidden" name="wearSizeId" value="@item.WearSizeId" />
+                                        <input type="hidden" name="wearColorId" value="@item.WearColorId" />
+                                        <input type="hidden" name="delta" value="-1" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle" aria-label="Decrease">&minus;</button>
+                                    </form>
+                                    <span class="mx-2 fw-bold" style="min-width: 28px; text-align: center;">@item.Quantity</span>
+                                    <form asp-action="ChangeQuantity" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.ProductId" />
+                                        <input type="hidden" name="wearSizeId" value="@item.WearSizeId" />
+                                        <input type="hidden" name="wearColorId" value="@item.WearColorId" />
+                                        <input type="hidden" name="delta" value="1" />
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary rounded-circle" aria-label="Increase">&plus;</button>
+                                    </form>
+                                </div>
+                            </td>
+                            <td class="text-end fw-bold">@item.LineTotal.ToString("C")</td>
+                            <td>
+                                <form asp-action="RemoveFromCart" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="@item.ProductId" />
+                                    <input type="hidden" name="wearSizeId" value="@item.WearSizeId" />
+                                    <input type="hidden" name="wearColorId" value="@item.WearColorId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer d-flex justify-content-between align-items-center py-3">
+            <h4 class="mb-0 price-tag">Total: <span class="fw-bold">@total.ToString("C")</span></h4>
+            @if (signedIn)
+            {
+                <form asp-controller="Orders" asp-action="Checkout" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-success btn-lg">Checkout</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login"
+                   asp-route-returnUrl="@Context.Request.Path" class="btn btn-success btn-lg">Login to checkout</a>
+            }
+        </div>
+    </div>
+}

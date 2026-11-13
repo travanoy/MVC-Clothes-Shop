@@ -1,0 +1,55 @@
+@model ProductListItem
+@{
+    var favoriteIds = ViewBag.FavoriteIds as List<int> ?? new List<int>();
+    var isFavorite = favoriteIds.Contains(Model.Id);
+    var currentUrl = Context.Request.Path + Context.Request.QueryString;
+}
+
+<div class="card h-100 position-relative">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <form asp-controller="Favorites" asp-action="Toggle" asp-route-id="@Model.Id" method="post"
+              class="js-favorite-form position-absolute top-0 end-0 m-2" style="z-index: 5;">
+            <input type="hidden" name="returnUrl" value="@currentUrl" />
+            <button type="submit"
+                    class="btn btn-sm rounded-circle shadow-sm btn-heart @(isFavorite ? "btn-danger" : "")"
+                    title="@(isFavorite ? "Remove from favorites" : "Add to favorites")">
+                @(isFavorite ? "❤️" : "🤍")
+            </button>
+        </form>
+    }
+
+    <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id">
+        <img src="@Model.ImageUrl"
+             class="card-img-top"
+             style="height: 200px; object-fit: cover;"
+             onerror="this.onerror=null;this.src='/Placeholder.jpg'"
+             alt="@Model.Name" />
+    </a>
+
+    <div class="card-body">
+        <h5 class="card-title mb-1">
+            <a asp-controller="Products" asp-action="Details" asp-route-id="@Model.Id"
+               class="text-dark text-decoration-none">
+                @Model.Name
+            </a>
+        </h5>
+        <span class="badge bg-secondary mb-2">@Model.CategoryName</span>
+        <p class="card-text text-truncate">@Model.Description</p>
+        <p class="price-tag fw-bold mb-0">@Model.Price.ToString("C")</p>
+    </div>
+
+    <div class="card-footer d-flex gap-2">
+        @if (Model.IsAvailable)
+        {
+            <form asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" method="post" class="flex-fill">
+                <input type="hidden" name="returnUrl" value="@Url.Action("Details", "Products", new { id = Model.Id })" />
+                <button type="submit" class="btn btn-primary w-100">Add to cart</button>
+            </form>
+        }
+        else
+        {
+            <button type="button" class="btn btn-secondary w-100" disabled>Out of stock</button>
+        }
+    </div>
+</div>
